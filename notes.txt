@@ -1,0 +1,7 @@
+set google application credentials
+$ENV:GOOGLE_APPLICATION_CREDENTIALS = "..\calendar-383306-6f0380b9faff.json"
+
+export datastore indexes file
+gcloud app deploy index.yaml
+
+make sure you active the virtual environment
