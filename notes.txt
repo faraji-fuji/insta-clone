@@ -5,3 +5,11 @@ export datastore indexes file
 gcloud app deploy index.yaml
 
 make sure you active the virtual environment
+
+
+
+
+
+
+VSx9QWNBtCX6uIXy4GAAuwYC4nJ2
+VSx9QWNBtCX6uIXy4GAAuwYC4nJ2

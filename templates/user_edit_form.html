@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h3>Profile setup form</h3>
+
+
+<form action="/user/{{ user_entity.key.id_or_name }}/edit" method="post">
+
+    <label for="username">username:</label>
+    <input type="text" name="username" id="username" placeholder="@user">
+    <br>
+
+    <label for="profile_name">ProfileName:</label>
+    <input type="text" name="profile_name" id="profile_name">
+
+    <br>
+
+    <button type="submit">Update</button>
+
+</form>
+
+
+{% endblock %}

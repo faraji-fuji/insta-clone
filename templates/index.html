@@ -1,5 +1,11 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<p>Hello world</p>
+<p>Hello {{ user_entity['profile_name'] }}</p>
+<p>Main feed</p>
+<ul>
+    <li>
+        <a href="/user/{{ user_id }}">Profile</a>
+    </li>
+</ul>
 {% endblock %}
