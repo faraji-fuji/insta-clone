@@ -112,7 +112,6 @@ def user_show_api(id):
     user_key = datastore_client.key("User", id)
     user_entity = datastore_client.get(user_key)
 
-    pprint(user_entity)
 
     following = len(user_entity['following'])
     followers = len(user_entity['followers'])
@@ -165,8 +164,6 @@ def user_delete():
     '''
     pass
 
-##############################################################################
-
 
 @app.route('/api/user/id', methods=['GET'])
 def api_user_id():
@@ -186,8 +183,8 @@ def user_followers(id):
 
 
 ##############################################################################
-
-# post
+# Post routes
+##############################################################################
 
 
 @app.route('/post', methods=['GET'])
@@ -196,6 +193,21 @@ def post_index():
     All posts of a user
     '''
     return jsonify([1, 2, 3, 4, 5])
+
+
+@app.route('/api/post')
+def  api_post_index():
+    '''
+    Get all posts of the current user and return a json response.
+    '''
+    user_id = session['user_id']
+    posts = my_post.get_posts(user_id)
+    my_posts = []
+
+    for post in posts:
+        my_posts.append(post)
+
+    return jsonify(my_posts)
 
 
 @app.route('/post/new', methods=['GET'])
@@ -211,16 +223,20 @@ def post_create():
     '''
     Create a new post
     '''
+    # get user id from session
     user_id = session['user_id']
 
+    #get file and caption uploaded from the browser 
     file = request.files['file_name']
-    image_url = my_post.upload_file(file)
     caption = request.form['caption']
 
+    # upload file to cloud storage, get public url
+    image_url = my_post.upload_file(file)
 
+    #create a post entity 
     my_post.create_post(user_id, caption, image_url)
 
-    return redirect('/')
+    return redirect(request.url)
 
 
 @app.route('/post/<int:id>', methods=['GET'])

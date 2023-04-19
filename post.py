@@ -47,4 +47,14 @@ class Post():
 
         return blob.public_url
 
+    def get_posts(self, user_id):
+        '''
+        Get all the posts of the current user.
+        '''
+        ancestor_key = self.datastore_client.key('User', user_id)
+        query = self.datastore_client.query(kind='Post', ancestor=ancestor_key)
+        query.order = ['-date_created']
+        posts = query.fetch()
+
+        return posts
 

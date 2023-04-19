@@ -39,7 +39,10 @@ Followers
 <!-- <img src="https://storage.googleapis.com/calendar-383306.appspot.com/photo-1594282486552-05b4d80fbb9f.jpg" alt=""> -->
 
 <h4>my posts</h4>
-<div id="posts"></div>
+<div id="posts">
+
+
+</div>
 
 {% if error_message %}
 <p>error: {{ error_message }}</p>
@@ -64,11 +67,23 @@ Followers
         })
 
         // get posts
-        $.get("http://127.0.0.1:8080/post", function (data, status) {
-            console.log(data);
-            for (dat in data) {
-                $("#posts").append(`<p> post ${dat}</p>`)
+        $.get("http://127.0.0.1:8080/api/post", function (data, status) {
+
+
+
+
+
+
+
+            for (i = 0; i < data.length; i++) {
+                $("#posts").append(`
+                <div>
+                    <img height = "100" src="${data[i].image_url}" alt="" id="">
+                    <caption>${data[i].caption}</caption>
+                </div>
+                `)
             }
+
         });
     });
 </script>
