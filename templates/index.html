@@ -8,4 +8,38 @@
         <a href="/user/{{ user_id }}">Profile</a>
     </li>
 </ul>
+
+<!-- <form action="" id="search-form">
+
+</form> -->
+
+
+<input type="search" id="search">
+<button id="search-btn">search</button>
+
+
+<h5>results</h5>
+<div id="results">
+
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        // search
+        $("#search-btn").click(function () {
+            key_word = $('#search').val();
+            $.get(`/api/user/${key_word}/search`, function (data, status) {
+                console.log(data);
+
+                // render search results in html
+                for (i = 0; i < data.length; i++) {
+                    url = `/user/${data[i].user_id}`;
+                    $("#results").append(`<a href="${url}">${data[i].profile_name}</a>`);
+                }
+
+            });
+        });
+    });
+</script>
 {% endblock %}

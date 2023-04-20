@@ -38,13 +38,13 @@
 //   });
 // });
 
-$(document).ready(function () {
-  $("#profile").click(function () {
-    $.get("http://127.0.0.1:8080/post", function (data, status) {
-      posts = data.posts;
-      console.log(posts);
+// $(document).ready(function () {
+//   $("#profile").click(function () {
+//     $.get("http://127.0.0.1:8080/post", function (data, status) {
+//       posts = data.posts;
+//       console.log(posts);
 
-      console.log("possts");
-    });
-  });
-});
+//       console.log("possts");
+//     });
+//   });
+// });

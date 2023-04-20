@@ -66,19 +66,7 @@ def user_index():
     '''
     List of all users
     '''
-    all_users = [
-        {
-            "name": "farajiii",
-            "email": "faraji@gmail.coms"
-        },
-        {
-            "name": "fuji",
-            "email": "fuji@gmail.com"
-        }
-    ]
-
-    return jsonify(all_users)
-
+    pass
 
 @app.route('/user/new', methods=['GET'])
 def user_new():
@@ -99,7 +87,7 @@ def user_create():
 @app.route('/user/<string:id>', methods=['GET'])
 def user_show(id):
     '''
-    Show a user.
+    Show a user (profile).
     '''
     return render_template("profile.html", user_id=session['user_id'])
 
@@ -107,21 +95,41 @@ def user_show(id):
 @app.route('/api/user/<string:id>', methods=['GET'])
 def user_show_api(id):
     '''
-    Show a user.
+    Show a user (profile).
     '''
     user_key = datastore_client.key("User", id)
     user_entity = datastore_client.get(user_key)
 
-
     following = len(user_entity['following'])
     followers = len(user_entity['followers'])
+    posts = len(user_entity['posts'])
+    current_user = id == session["user_id"]
+
     data = {
         "following": following,
         "followers": followers,
+        "posts": posts,
+        "current_user": current_user,
         "profile_name": user_entity['profile_name'],
         "username": user_entity['username']}
 
     return jsonify(data)
+
+@app.route('/api/user/<string:profile_name>/search')
+def user_search(profile_name):
+    results = []
+
+    query = datastore_client.query(kind = "User")
+    query.projection = ['profile_name']
+    user_entities = query.fetch()
+
+    for user_entity in user_entities:
+        if profile_name in user_entity['profile_name']:
+            results.append({
+                "user_id": user_entity.key.id_or_name,
+                "profile_name":user_entity['profile_name']
+            })
+    return jsonify(results)
 
 
 @app.route('/user/<string:user_id>/edit', methods=['GET'])
@@ -156,6 +164,19 @@ def user_update(user_id):
     datastore_client.put(user_entity)
     return redirect("/")
 
+@app.route('/api/user/<string:follow_user_id>/follow', methods=['POST'])
+def user_update_follow(follow_user_id):
+    ''' Follow a user. '''
+    user_id = session['user_id']
+    my_user.follow_user(user_id, follow_user_id)
+    return "success", 201
+    
+@app.route('/api/user/<string:unfollow_user_id>/unfollow', methods=['POST'])
+def user_update_unfollow(unfollow_user_id):
+    ''' Unfollow a user. '''
+    user_id = session['user_id']
+    my_user.unfollow_user(user_id, unfollow_user_id)
+    return "success", 200
 
 @app.route('/user/<int:id>', methods=['DELETE'])
 def user_delete():
@@ -236,7 +257,8 @@ def post_create():
     #create a post entity 
     my_post.create_post(user_id, caption, image_url)
 
-    return redirect(request.url)
+    url = f"/user/{session['user_id']}"
+    return redirect(url)
 
 
 @app.route('/post/<int:id>', methods=['GET'])
