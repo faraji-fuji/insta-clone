@@ -9,36 +9,47 @@
 <p id="username"></p>
 
 
+<!-- follow button -->
+<button id="follow-btn" hidden="true">Follow</button>
+
+<!-- user id -->
+<div id="user_id" hidden="true">{{ user_id }}</div>
+
 <br>
 <br>
 
+<!-- following -->
 Following
 <a href="/user/{{ user_id }}/following">
     <button id="following"></button>
 </a>
 
+<!-- followers -->
 Followers
 <a href="/user/{{ user_id }}/followers">
     <button id="followers"></button>
 </a>
 
-
 <br>
 <br>
 
-<h4>add post</h4>
-<form action="/post" method="post" enctype="multipart/form-data">
-    Upload File: <input type="file" name="file_name" />
+<!-- Post -->
+<div id="add-post">
+    <h4>add post</h4>
+    <form action="/post" method="post" enctype="multipart/form-data">
+        Upload File: <input type="file" name="file_name" />
 
-    <label for="caption">Caption</label>
-    <input type="text" name="caption" id="caption">
+        <label for="caption">Caption</label>
+        <input type="text" name="caption" id="caption">
 
-    <button type="submit">Post</button>
-</form>
+        <button type="submit">Post</button>
+    </form>
+</div>
+
 
 <!-- <img src="https://storage.googleapis.com/calendar-383306.appspot.com/photo-1594282486552-05b4d80fbb9f.jpg" alt=""> -->
 
-<h4>my posts</h4>
+<h4>posts</h4>
 <div id="posts">
 
 
@@ -52,29 +63,43 @@ Followers
 <script>
     $(document).ready(function () {
         // get user_id
-        $.get(`http://127.0.0.1:8080/api/user/id`, function (data, status) {
-            user_id = data.user_id
+        user_id = $("#user_id").text()
 
-            // get profile data
-            $.get(`http://127.0.0.1:8080/api/user/${user_id}`, function (data, status) {
+        // get profile data of the associated user id.
+        $.get(`http://127.0.0.1:8080/api/user/${user_id}`, function (data, status) {
 
-                // render dynamic data
-                $("#username").text(data.username)
-                $("#profile_name").text(data.profile_name)
-                $("#following").text(data.following)
-                $("#followers").text(data.followers)
-            })
+            // render dynamic data
+            $("#username").text(data.username)
+            $("#profile_name").text(data.profile_name)
+            $("#following").text(data.following)
+            $("#followers").text(data.followers)
+
+            // check if profile is for the current user
+            if (data.current_user == false) {
+                // show or hide follow/unfollow button
+                if (data.is_following == true) {
+                    $("#follow-btn").show().text("Unfollow").click(function () {
+                        $.post(`/api/user/${user_id}/unfollow`, function (data, status) {
+                            $("#follow-btn").text("Follow")
+                        })
+
+                    })
+                }
+                else {
+                    $("#follow-btn").show().text("Follow").click(function () {
+                        $.post(`/api/user/${user_id}/follow`, function (data, status) {
+                            $("#follow-btn").text("Unfollow")
+                        })
+                    })
+                }
+
+                // hide section to add post
+                $("#add-post").hide();
+            }
         })
 
         // get posts
-        $.get("http://127.0.0.1:8080/api/post", function (data, status) {
-
-
-
-
-
-
-
+        $.get(`http://127.0.0.1:8080/api/post/${user_id}`, function (data, status) {
             for (i = 0; i < data.length; i++) {
                 $("#posts").append(`
                 <div>
@@ -83,7 +108,6 @@ Followers
                 </div>
                 `)
             }
-
         });
     });
 </script>

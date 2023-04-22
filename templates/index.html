@@ -19,9 +19,10 @@
 
 
 <h5>results</h5>
-<div id="results">
+<div id="results"></div>
 
-</div>
+<h5>timeline</h5>
+<div id="my-timeline"></div>
 
 <script>
     $(document).ready(function () {
@@ -40,6 +41,24 @@
 
             });
         });
+
+
+        // get timeline posts
+        $.get("/api/post/timeline", function (data, status) {
+            console.log(data)
+
+
+
+            for (i = 0; i < data.length; i++) {
+                $("#my-timeline").append(`
+                <div>
+                    <img height = "100" src="${data[i].image_url}" alt="" id="">
+                    <caption>${data[i].caption}</caption>
+                </div>
+                `)
+            }
+        })
+
     });
 </script>
 {% endblock %}

@@ -86,30 +86,31 @@ class User():
         # follow_user_entity_key = self.datastore_client.key('User', follow_user_entity)
         # entities = self.datastore_client.get_multi([user_entity_key, follow_user_entity_key])
 
-
         # get entities involved
         user_entity = self.get_user(user_id)
         follow_user_entity = self.get_user(follow_user_id)
 
         # add follow_user_id to the current user's following list
         following = user_entity['following']
-        following.append(follow_user_id)
-        user_entity.update({
-            'following': following
-        })
 
-        # add user_id to followers list of the account being followed 
-        followers = follow_user_entity['followers']
-        followers.append(user_id)
-        follow_user_entity.update({
-            'followers': followers
-        })
+        if follow_user_id not in following:
+            following.append(follow_user_id)
+            user_entity.update({
+                'following': following
+            })
 
-        # commit the changes as a transaction
-        transaction = self.datastore_client.transaction()
-        with transaction:
-            transaction.put(user_entity)
-            transaction.put(follow_user_entity)
+            # add user_id to followers list of the account being followed 
+            followers = follow_user_entity['followers']
+            followers.append(user_id)
+            follow_user_entity.update({
+                'followers': followers
+            })
+
+            # commit the changes as a transaction
+            transaction = self.datastore_client.transaction()
+            with transaction:
+                transaction.put(user_entity)
+                transaction.put(follow_user_entity)
 
     def unfollow_user(self, user_id, unfollow_user_id):
         ''' Unfollow a user.
@@ -122,20 +123,21 @@ class User():
 
         # remove follow_user_id to the current user's following list
         following = user_entity['following']
-        following.remove(unfollow_user_id)
-        user_entity.update({
-            'following': following
-        })
+        if unfollow_user_id in following:
+            following.remove(unfollow_user_id)
+            user_entity.update({
+                'following': following
+            })
 
-        # remove user_id to followers list of the account being followed 
-        followers = unfollow_user_entity['followers']
-        followers.remove(user_id)
-        unfollow_user_entity.update({
-            'followers': followers
-        })
+            # remove user_id to followers list of the account being followed 
+            followers = unfollow_user_entity['followers']
+            followers.remove(user_id)
+            unfollow_user_entity.update({
+                'followers': followers
+            })
 
-        # commit the changes as a transaction
-        transaction = self.datastore_client.transaction()
-        with transaction:
-            transaction.put(user_entity)
-            transaction.put(unfollow_user_entity)
+            # commit the changes as a transaction
+            transaction = self.datastore_client.transaction()
+            with transaction:
+                transaction.put(user_entity)
+                transaction.put(unfollow_user_entity)

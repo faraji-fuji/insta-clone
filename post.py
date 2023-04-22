@@ -27,6 +27,7 @@ class Post():
         post_entity = datastore.Entity(key= self.datastore_client.key('User', user_id, 'Post'))
         post_entity.update({
             'likes': 0,
+            'publisher': user_id,
             'comments': [],
             'caption': caption,
             'image_url': image_url,

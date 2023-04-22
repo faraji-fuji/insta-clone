@@ -84,32 +84,44 @@ def user_create():
     pass
 
 
-@app.route('/user/<string:id>', methods=['GET'])
-def user_show(id):
+@app.route('/user/<string:user_id>', methods=['GET'])
+def user_show(user_id):
     '''
     Show a user (profile).
     '''
-    return render_template("profile.html", user_id=session['user_id'])
+    return render_template("profile.html", user_id=user_id)
 
 
-@app.route('/api/user/<string:id>', methods=['GET'])
-def user_show_api(id):
+@app.route('/api/user/<string:user_id>', methods=['GET'])
+def user_show_api(user_id):
     '''
     Show a user (profile).
     '''
-    user_key = datastore_client.key("User", id)
+    is_following = None
+
+    user_key = datastore_client.key("User", user_id)
     user_entity = datastore_client.get(user_key)
 
+    # get profile page statistics 
     following = len(user_entity['following'])
     followers = len(user_entity['followers'])
     posts = len(user_entity['posts'])
-    current_user = id == session["user_id"]
+
+    # check if the user_id belongs to the current user
+    current_user = user_id == session["user_id"]
+
+    # check following status
+    if session["user_id"] in user_entity['followers']:
+        is_following = True
+    else:
+        is_following = False
 
     data = {
         "following": following,
         "followers": followers,
         "posts": posts,
         "current_user": current_user,
+        "is_following": is_following,
         "profile_name": user_entity['profile_name'],
         "username": user_entity['username']}
 
@@ -216,12 +228,11 @@ def post_index():
     return jsonify([1, 2, 3, 4, 5])
 
 
-@app.route('/api/post')
-def  api_post_index():
+@app.route('/api/post/<string:user_id>')
+def  api_post_index(user_id):
     '''
-    Get all posts of the current user and return a json response.
+    Get all posts of the associated user_id and return a json response.
     '''
-    user_id = session['user_id']
     posts = my_post.get_posts(user_id)
     my_posts = []
 
@@ -229,6 +240,40 @@ def  api_post_index():
         my_posts.append(post)
 
     return jsonify(my_posts)
+
+
+@app.route('/api/post/timeline')
+def api_post_user_timeline():
+    ''' Get timeline posts. '''
+    # get user id from session
+    user_id = session["user_id"]
+    result = None
+    queries = []
+    results = []
+
+    # get following list
+    my_key = datastore_client.key("User", user_id)
+    my_entity = datastore_client.get(my_key)
+    following = my_entity['following']
+    following.append(user_id)
+
+    # get posts from each person you follow, including yourself
+    if following:
+        for id in following:
+            query = datastore_client.query(kind='Post')
+            query.add_filter("publisher", "=", id)
+            queries.append(query)
+
+        for query in queries:
+            result = query.fetch()
+            for item in result:
+                results.append(item)
+                
+        # sort the posts by date_created
+        results.sort(key = lambda x: x["date_created"], reverse = True)
+
+    # return the first 50 items 
+    return jsonify(results[:50])
 
 
 @app.route('/post/new', methods=['GET'])
