@@ -24,6 +24,8 @@
 <h5>timeline</h5>
 <div id="my-timeline"></div>
 
+
+
 <script>
     $(document).ready(function () {
 
@@ -48,14 +50,34 @@
             console.log(data)
 
 
-
+            // render each post
             for (i = 0; i < data.length; i++) {
-                $("#my-timeline").append(`
-                <div>
-                    <img height = "100" src="${data[i].image_url}" alt="" id="">
-                    <caption>${data[i].caption}</caption>
-                </div>
-                `)
+                $("#my-timeline").append(
+
+                    `
+                    <div>
+                        <div>
+                            <img height = "100" src="${data[i].image_url}" alt="" id="">
+                            <br>
+                            <caption>${data[i].caption}</caption>
+                            <div id="comments">Comments</div>
+                        </div>
+
+                        <form id="comment-form" action="/api/post/${data[i].post_id}/${data[i].publisher}/comment" method="post">
+                            <label for="comment"></label>
+                            <input id="comment" type="text" name="comment" placeholder="Add comment..">
+                            <button type="submit">post</button>
+                        </form>
+                        
+                        <br>
+                    </div>
+                    
+                    `
+                )
+
+                // render comments for each post
+
+
             }
         })
 

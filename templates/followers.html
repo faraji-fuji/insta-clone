@@ -1,11 +1,19 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h3>Followers</h3>
+<div id="user_id" hidden="true">{{ user_id }}</div>
 
+<h3>Followers</h3>
+<div id="follower-list"></div>
 
 <script>
+    $(document).ready(function () {
+        user_id = $("#user_id").text()
 
+        $.get(`/api/user/${user_id}/followers`, function (data, status) {
+            console.log(data)
+        })
 
+    })
 </script>
 {% endblock %}
