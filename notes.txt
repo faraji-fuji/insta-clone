@@ -6,22 +6,3 @@ gcloud app deploy index.yaml --project calendar-383306
 
 make sure you active the virtual environment
 
-
-
-
-
-
-VSx9QWNBtCX6uIXy4GAAuwYC4nJ2
-VSx9QWNBtCX6uIXy4GAAuwYC4nJ2
-
-
-
-
-
-$cred = gcloud auth print-access-token
-$headers = @{ "Authorization" = "Bearer $cred" }
-
-Invoke-WebRequest `
-    -Method GET `
-    -Headers $headers `
-    -Uri "https://datastore.googleapis.com/v1/projects/calendar-383306/operations" | Select-Object -Expand Content

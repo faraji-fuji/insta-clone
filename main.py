@@ -84,7 +84,6 @@ def api_user_show(user_id):
     # get profile page statistics
     following = len(user_entity['following'])
     followers = len(user_entity['followers'])
-    posts = len(user_entity['posts'])
 
     # check if the user_id belongs to the current user
     current_user = user_id == session["user_id"]
@@ -98,7 +97,6 @@ def api_user_show(user_id):
     data = {
         "following": following,
         "followers": followers,
-        "posts": posts,
         "current_user": current_user,
         "is_following": is_following,
         "profile_name": user_entity['profile_name'],
@@ -107,8 +105,8 @@ def api_user_show(user_id):
     return jsonify(data)
 
 
-@app.route('/api/user/<string:profile_name>/search')
-def user_search(profile_name):
+@app.route('/search', methods=['POST'])
+def user_search():
     ''' Search a user by profile name
 
     :param profile_name: The profile name to search.
@@ -116,17 +114,22 @@ def user_search(profile_name):
     '''
     results = []
 
+    profile_name = request.form['profile_name']
+
     query = datastore_client.query(kind="User")
-    query.projection = ['profile_name']
+    query.projection = ['profile_name', 'username']
     user_entities = query.fetch()
 
     for user_entity in user_entities:
         if profile_name in user_entity['profile_name']:
             results.append({
                 "user_id": user_entity.key.id_or_name,
-                "profile_name": user_entity['profile_name']
+                "profile_name": user_entity['profile_name'],
+                "username": user_entity['username']
             })
-    return jsonify(results)
+
+    pprint(results)
+    return render_template("search-results.html", results=results)
 
 
 @app.route('/user/<string:user_id>/edit', methods=['GET'])
@@ -265,7 +268,7 @@ def api_user_following(user_id):
 
     following_keys = []
     for follow in following:
-        follow_key = datastore_client("User", follow)
+        follow_key = datastore_client.key("User", follow)
         following_keys.append(follow_key)
 
     following_entities = datastore_client.get_multi(following_keys)
@@ -300,6 +303,8 @@ def api_user_followers(user_id):
         follower_keys.append(follower_key)
 
     follower_entities = datastore_client.get_multi(follower_keys)
+
+    pprint(follower_entities)
 
     return jsonify(follower_entities)
 
@@ -353,6 +358,11 @@ def api_post_user_timeline():
             result = query.fetch()
             for item in result:
                 item["post_id"] = item.key.id_or_name
+                user_entity = datastore_client.get(
+                    key=datastore_client.key('User', item['publisher']))
+
+                item['profile_name'] = user_entity['profile_name']
+                item['username'] = user_entity['username']
                 results.append(item)
 
         # sort the posts by date_created
@@ -362,10 +372,20 @@ def api_post_user_timeline():
     return jsonify(results[:50])
 
 
+@app.route('/post/new', methods=['GET'])
+def post_create_form():
+    ''' Form to create a new post. '''
+
+    return render_template("post-create.html", user_id=session['user_id'])
+
+
 @app.route('/post', methods=['POST'])
 def post_create():
     ''' Create a new post. '''
     user_id = session['user_id']
+
+    user_entity = datastore_client.get("User", user_id)
+    publisher_profile_name = user_entity['profile_name']
 
     # get file and caption uploaded from the browser
     file = request.files['file_name']
@@ -384,6 +404,8 @@ def post_create():
     post_entity.update({
         'likes': 0,
         'publisher': user_id,
+        'publisher_profile_name': publisher_profile_name,
+        'publisher_username': publisher_username,
         'comments': [],
         'caption': caption,
         'image_url': image_url,
@@ -391,8 +413,7 @@ def post_create():
     })
     datastore_client.put(post_entity)
 
-    url = f"/user/{session['user_id']}"
-    return redirect(url)
+    return redirect('/')
 
 
 @app.route('/api/post/<int:post_id>/<string:user_id>/comment', methods=['POST'])

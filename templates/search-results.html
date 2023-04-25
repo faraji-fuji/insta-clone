@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<!-- Search results -->
+
+<div class='flex flex-col min-h-screen p-16 bg-gray-100'>
+    <div class='user-list w-full max-w-lg mx-auto bg-white rounded shadow flex flex-col py-4'>
+
+        {% for result in results %}
+
+        <!--User row -->
+
+        <div
+            class="user-row flex flex-col items-center justify-between cursor-pointer  p-4 duration-300 sm:flex-row sm:py-4 sm:px-8 hover:bg-[#f6f8f9]">
+            <div class="user flex items-center text-center flex-col sm:flex-row sm:text-left">
+                <div class="avatar-content mb-2.5 sm:mb-0 sm:mr-2.5">
+                    <img class="avatar w-20 h-20 rounded-full"
+                        src="{{ url_for('static', filename='instagram-profile-icon.png') }}" />
+                </div>
+                <div class="user-body flex flex-col mb-4 sm:mb-0 sm:mr-4">
+                    <a href="/user/{{ result['user_id'] }}" class="title font-medium no-underline">{{
+                        result['profile_name']}}
+                    </a>
+                    <div class="skills flex flex-col">
+                        <span class="subtitle text-slate-500">{{ result['username'] }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

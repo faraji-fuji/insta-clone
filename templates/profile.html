@@ -1,59 +1,92 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h3> User profile </h3>
-<p>Profile Name:</p>
-<p id="profile_name"></p>
 
-<p>User Name: </p>
-<p id="username"></p>
+<!--profile data-->
+<div class="bg-gray-100 h-auto px-48">
+    <div class="flex md:flex-row-reverse flex-wrap">
+        <div class="w-full md:w-3/4 p-4 text-center">
+            <div class="text-left pl-4 pt-3">
+                <!-- user name -->
+                <span id="username" class="text-base text-gray-700 text-2xl mr-2"></span>
 
+                <!-- follow button -->
+                <span class="text-base font-semibold text-gray-700 mr-2">
+                    <button class="bg-blue-500 hover:bg-blue-400 text-white border-transparent rounded py-2 px-4"
+                        id="follow-btn" hidden="true">
+                        Follow
+                    </button>
+                </span>
+            </div>
 
-<!-- follow button -->
-<button id="follow-btn" hidden="true">Follow</button>
+            <!-- profile stats -->
+            <div class="text-left pl-4 pt-3">
+                <span class="text-base font-semibold text-gray-700 mr-2">
+                    <b id="num-posts">0</b> posts
+                </span>
+
+                <!-- followers -->
+                <a href="/user/{{ user_id }}/followers">
+                    <span class="text-base font-semibold text-gray-700 mr-2">
+                        <b id="followers">0</b> followers
+                    </span>
+                </a>
+
+                <!-- following -->
+                <a href="/user/{{ user_id }}/following">
+                    <span class="text-base font-semibold text-gray-700">
+                        <b id="following">0</b> following
+                    </span>
+                </a>
+            </div>
+
+            <!-- profile name -->
+            <div class="text-left pl-4 pt-3">
+                <span id="profile_name" class="text-lg font-bold text-gray-700 mr-2"></span>
+            </div>
+        </div>
+
+        <!-- profile picture -->
+        <div class="w-full md:w-1/4 p-4 text-center ">
+            <div class="w-full  md:w-3/4 text-center mt-8">
+                <button class="flex rounded-full" id="user-menu" aria-label="User menu" aria-haspopup="true">
+                    <img class="h-40 w-40 rounded-full"
+                        src="{{ url_for('static', filename='instagram-profile-icon.png') }}" alt />
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <hr class="border-gray-500 mt-6" />
+
+    <!--post icon and title-->
+    <div class="flex flex-row mt-4 justify-center mr-16">
+        <div class="flex text-gray-700 text-center py-2 m-2 pr-5">
+            <div class="flex inline-flex">
+                <button
+                    class="border-transparent text-gray-800 rounded-full hover:text-blue-600 focus:outline-none focus:text-gray-600"
+                    aria-label="Notifications">
+                    <svg class="h-6 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex inline-flex ml-2 mt-1">
+                <h3 class="text-sm font-bold text-gray-800 mr-2">POSTS</h3>
+            </div>
+        </div>
+    </div>
+
+    <!--post images-->
+    <div id="posts" class="grid grid-cols-3 gap-4 pt-4 pb-16">
+
+    </div>
+</div>
 
 <!-- user id -->
 <div id="user_id" hidden="true">{{ user_id }}</div>
-
-<br>
-<br>
-
-<!-- following -->
-Following
-<a href="/user/{{ user_id }}/following">
-    <button id="following"></button>
-</a>
-
-<!-- followers -->
-Followers
-<a href="/user/{{ user_id }}/followers">
-    <button id="followers"></button>
-</a>
-
-<br>
-<br>
-
-<!-- Post -->
-<div id="add-post">
-    <h4>add post</h4>
-    <form action="/post" method="post" enctype="multipart/form-data">
-        Upload File: <input type="file" name="file_name" />
-
-        <label for="caption">Caption</label>
-        <input type="text" name="caption" id="caption">
-
-        <button type="submit">Post</button>
-    </form>
-</div>
-
-
-<!-- <img src="https://storage.googleapis.com/calendar-383306.appspot.com/photo-1594282486552-05b4d80fbb9f.jpg" alt=""> -->
-
-<h4>posts</h4>
-<div id="posts">
-
-
-</div>
 
 {% if error_message %}
 <p>error: {{ error_message }}</p>
@@ -82,7 +115,6 @@ Followers
                         $.post(`/api/user/${user_id}/unfollow`, function (data, status) {
                             $("#follow-btn").text("Follow")
                         })
-
                     })
                 }
                 else {
@@ -100,11 +132,15 @@ Followers
 
         // get posts
         $.get(`http://127.0.0.1:8080/api/post/${user_id}`, function (data, status) {
+
+            // render number of posts
+            $("#num-posts").text(data.length)
+
+            // render each post
             for (i = 0; i < data.length; i++) {
                 $("#posts").append(`
-                <div>
-                    <img height = "100" src="${data[i].image_url}" alt="" id="">
-                    <caption>${data[i].caption}</caption>
+                <div class="text-center ">
+                    <img class="w-full" src="${data[i].image_url}" />
                 </div>
                 `)
             }

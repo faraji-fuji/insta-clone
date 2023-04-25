@@ -10,3 +10,8 @@ indexes:
   properties:
   - name: date_created
     direction: desc
+
+- kind: User
+  properties:
+  - name: profile_name
+  - name: username

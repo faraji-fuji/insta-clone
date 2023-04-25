@@ -19,12 +19,14 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="https://www.gstatic.com/firebasejs/ui/4.4.0/firebase-ui-auth.js"></script>
 
+    <!-- tailwind css -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
 </head>
 
 <body class="">
     <div id="firebase-auth-container"></div>
 
-    <a type="button" href="/logout" id="sign-out" hidden="true">Sign-out</a>
     <div id="login-info" hidden="true">
 
     </div>
@@ -32,11 +34,115 @@
 
 
     <div id="main-content" hidden="true">
-        {% block content %}
 
-        {% endblock%}
+        <div class="insta-clone">
+            <nav class="sticky top-0 bg-white shadow px-48 border-b border-gray-400">
+                <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+                    <div class="flex justify-between h-16">
+                        <div class="flex px-2 lg:px-0">
+                            <div class="flex-shrink-0 flex items-center">
+                                <img class="block lg:hidden h-8 w-auto"
+                                    src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
+                                    alt="Workflow logo" />
+                                <img class="hidden lg:block h-8 w-auto"
+                                    src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
+                                    alt="Workflow logo" />
+                            </div>
+                        </div>
+                        <div class="flex-1 flex items-center justify-center px-2 lg:ml-12">
+
+                            <form id="search-form" action="/search" method="post">
+                                <div class="max-w-lg w-full lg:max-w-xs">
+                                    <label for="search" class="sr-only">Search</label>
+                                    <div class="relative">
+
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-2">
+                                            <button type="submit" class="p-1 focus:outline-none focus:shadow-outline">
+                                                <svg fill="none" stroke="currentColor" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                                                    class="w-6 h-6">
+                                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </span>
+
+
+                                        <input id="search"
+                                            class="block w-full pl-10 pr-3 py-2 border border-gray-400 rounded-md leading-5 bg-gray-100 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-blue-300 focus:shadow-outline-blue sm:text-sm transition duration-150 ease-in-out"
+                                            placeholder="Search" type="search" name="profile_name" />
+
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+
+                        <!-- icons-->
+                        <div class="lg:ml-4 lg:flex lg:items-center">
+
+                            <!-- home button -->
+                            <a href="/">
+                                <button
+                                    class="flex-shrink-0 p-1 border-transparent text-gray-700 rounded-full hover:text-gray-600 focus:outline-none focus:text-gray-600 transition duration-150 ease-in-out"
+                                    aria-label="Notifications">
+                                    <svg class="h-6 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                </button>
+                            </a>
+
+                            <!-- create new post button -->
+                            <a href="/post/new">
+                                <button
+                                    class="flex-shrink-0 p-1 border-transparent text-gray-700 rounded-full hover:text-gray-600 focus:outline-none focus:text-gray-600 transition duration-150 ease-in-out"
+                                    aria-label="Notifications">
+                                    <svg class="h-6 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                </button>
+                            </a>
+
+                            <!-- user -->
+                            <a href="/user/{{ user_id }}">
+                                <button
+                                    class="flex-shrink-0 p-1 border-transparent text-gray-700 rounded-full hover:text-gray-600 focus:outline-none focus:text-gray-600 transition duration-150 ease-in-out"
+                                    aria-label="Notifications">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </button>
+                            </a>
+
+
+                            <!-- logout -->
+                            <a href="/logout" id="sign-out" hidden="true">
+                                <button
+                                    class="flex-shrink-0 p-1 border-transparent text-gray-700 rounded-full hover:text-gray-600 focus:outline-none focus:text-gray-600 transition duration-150 ease-in-out"
+                                    aria-label="Notifications">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                                    </svg>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            {% block content %}
+
+            {% endblock%}
+        </div>
     </div>
-
     <!-- Firebase scripts -->
     <script src="https://www.gstatic.com/firebasejs/7.14.5/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.8.0/firebase-auth.js"></script>
