@@ -388,8 +388,11 @@ def post_create():
     ''' Create a new post. '''
     user_id = session['user_id']
 
-    user_entity = datastore_client.get("User", user_id)
+    user_key = datastore_client.key("User", user_id)
+    user_entity = datastore_client.get(user_key)
+
     publisher_profile_name = user_entity['profile_name']
+    publisher_username = user_entity['username']
 
     # get file and caption uploaded from the browser
     file = request.files['file_name']
