@@ -17,6 +17,7 @@ bucket = storage_client.bucket(local_constants.PROJECT_STORAGE_BUCKET)
 
 @app.route('/')
 def root():
+    ''' Function to handle the home route. '''
     id_token = request.cookies.get("token")
     user_entity = None
     user_id = None
@@ -221,7 +222,7 @@ def user_update_unfollow(unfollow_user_id):
     unfollow_user_key = datastore_client.key("User", unfollow_user_id)
     unfollow_user_entity = datastore_client.get(unfollow_user_key)
 
-    # remove follow_user_id to the current user's following list
+    # remove follow_user_id from the current user's following list
     following = user_entity['following']
     if unfollow_user_id in following:
         following.remove(unfollow_user_id)
@@ -229,7 +230,7 @@ def user_update_unfollow(unfollow_user_id):
             'following': following
         })
 
-        # remove user_id to followers list of the account being followed
+        # remove user_id from followers list of the account being unfollowed
         followers = unfollow_user_entity['followers']
         followers.remove(user_id)
         unfollow_user_entity.update({
@@ -315,9 +316,10 @@ def api_user_followers(user_id):
 
 @app.route('/api/post/<string:user_id>')
 def api_post_index(user_id):
-    ''' Get all posts of the associated user_id and return a json response.
+    ''' Get all posts of the associated user_id.
 
     :param user_id: The identifier of the user whose posts we are getting.
+    :return: A list of posts
     '''
     ancestor_key = datastore_client.key('User', user_id)
     query = datastore_client.query(kind='Post', ancestor=ancestor_key)
