@@ -50,6 +50,7 @@ def root():
 
             # session['user_entity'] = user_entity
             session['user_id'] = claims['user_id']
+            session['username'] = user_entity['username']
 
         except ValueError as exc:
             error_message = str(exc)
@@ -128,7 +129,6 @@ def user_search():
                 "username": user_entity['username']
             })
 
-    pprint(results)
     return render_template("search-results.html", results=results)
 
 
@@ -273,6 +273,8 @@ def api_user_following(user_id):
 
     following_entities = datastore_client.get_multi(following_keys)
 
+    following_entities.sort(key=lambda x: x['date_created'], reverse=True)
+
     return jsonify(following_entities)
 
 
@@ -303,9 +305,6 @@ def api_user_followers(user_id):
         follower_keys.append(follower_key)
 
     follower_entities = datastore_client.get_multi(follower_keys)
-
-    pprint(follower_entities)
-
     return jsonify(follower_entities)
 
 
@@ -363,6 +362,11 @@ def api_post_user_timeline():
 
                 item['profile_name'] = user_entity['profile_name']
                 item['username'] = user_entity['username']
+
+                # sort comments
+                item['comments'].sort(
+                    key=lambda x: x['date_created'], reverse=True)
+
                 results.append(item)
 
         # sort the posts by date_created
@@ -429,6 +433,7 @@ def api_post_comment(post_id, user_id):
     comments = post['comments']
     comments.append({
         "publisher": session['user_id'],
+        "publisher_username": session['username'],
         "comment": request.form['comment'],
         "date_created": datetime.datetime.now()
     })
